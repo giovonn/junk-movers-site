@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Booking Confirmed | Junk Movers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --asphalt:#17181C; --concrete:#EDEEF0; --card:#FFFFFF;
+    --yellow:#F5B800; --yellow-dark:#8A6400; --steel:#5B6067;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Work Sans',sans-serif; background:var(--concrete); color:var(--asphalt);
+    min-height:100vh; display:flex; align-items:center; justify-content:center; padding:24px;
+  }
+  h1{ font-family:'Oswald',sans-serif; text-transform:uppercase; font-size:clamp(26px,5vw,40px); line-height:1.15; margin:18px 0 14px; }
+  .wrap{ max-width:520px; text-align:center; }
+  .brand{ display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:36px; }
+  .brand-mark{ width:40px;height:40px; background:var(--asphalt); display:flex;align-items:center;justify-content:center; transform:skewX(-6deg); }
+  .brand-mark span{ color:var(--yellow); font-family:'Oswald'; font-weight:700; font-size:16px; transform:skewX(6deg); }
+  .brand-name{ font-family:'Oswald'; font-weight:700; font-size:18px; }
+  .brand-name em{ font-style:normal; color:var(--yellow-dark); }
+  .check{
+    width:64px;height:64px; border:3px solid var(--asphalt); border-radius:50%; background:var(--yellow);
+    display:flex; align-items:center; justify-content:center; margin:0 auto; font-size:30px; color:var(--asphalt); font-weight:700;
+  }
+  p{ color:var(--steel); font-size:15.5px; line-height:1.6; margin-bottom:10px; }
+  .board{ background:var(--card); color:var(--asphalt); border:2px solid var(--asphalt); margin-top:26px; text-align:left; }
+  .board-head{ background:var(--asphalt); color:var(--yellow); font-family:'IBM Plex Mono'; font-size:11.5px; letter-spacing:0.1em; padding:10px 18px; font-weight:700; }
+  .board-body{ padding:18px 20px; }
+  .board-row{ display:flex; gap:12px; padding:8px 0; font-size:14px; }
+  .board-row .n{ font-family:'IBM Plex Mono'; font-weight:700; color:var(--yellow-dark); }
+  .btn{
+    display:inline-block; margin-top:30px; font-family:'Oswald'; font-weight:600; text-transform:uppercase;
+    letter-spacing:0.03em; background:var(--yellow); color:var(--asphalt); padding:13px 26px; font-size:14.5px;
+    border:2px solid var(--asphalt); box-shadow:4px 4px 0 var(--asphalt); text-decoration:none;
+  }
+  .btn:hover{ transform:translate(2px,2px); box-shadow:2px 2px 0 var(--asphalt); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="brand">
+      <div class="brand-mark"><span>JM</span></div>
+      <div class="brand-name">JUNK <em>MOVERS</em></div>
+    </div>
+    <div class="check">&#10003;</div>
+    <h1>You're booked.</h1>
+    <p>Your card is authorized, not charged yet — we only charge once the job's complete. We'll text you to confirm your exact arrival window.</p>
+
+    <div class="board">
+      <div class="board-head">WHAT HAPPENS NEXT</div>
+      <div class="board-body">
+        <div class="board-row"><span class="n">01</span><span>We confirm your job with a crew and text you the exact arrival window.</span></div>
+        <div class="board-row"><span class="n">02</span><span>Crew shows up, hauls everything, done.</span></div>
+        <div class="board-row"><span class="n">03</span><span>Your card is charged the confirmed price once the job's complete.</span></div>
+      </div>
+    </div>
+
+    <a class="btn" href="/">Back to Junk Movers</a>
+  </div>
+</body>
+</html>

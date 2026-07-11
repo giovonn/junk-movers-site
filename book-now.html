@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book a Haul | Junk Movers</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://js.stripe.com/v3/"></script>
+<style>
+  :root{
+    --asphalt:#17181C; --concrete:#EDEEF0; --card:#FFFFFF;
+    --yellow:#F5B800; --yellow-dark:#8A6400; --steel:#5B6067; --line:#DADCE0; --go:#2E7D52; --err:#B23A2E;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{ font-family:'Work Sans',sans-serif; background:var(--concrete); color:var(--asphalt); line-height:1.55; }
+  h1,h2,.display{ font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:0.01em; line-height:1.1; }
+  .mono{ font-family:'IBM Plex Mono',monospace; }
+  a{ color:inherit; }
+  .wrap{ max-width:760px; margin:0 auto; padding:0 22px; }
+
+  header.nav{ background:var(--card); border-bottom:3px solid var(--asphalt); }
+  .nav .wrap{ display:flex; align-items:center; justify-content:space-between; padding:16px 22px; max-width:1140px; }
+  .brand{ display:flex; align-items:center; gap:10px; text-decoration:none; }
+  .brand-mark{ width:38px;height:38px; background:var(--asphalt); display:flex;align-items:center;justify-content:center; transform:skewX(-6deg); }
+  .brand-mark span{ color:var(--yellow); font-family:'Oswald'; font-weight:700; font-size:15px; transform:skewX(6deg); }
+  .brand-name{ font-family:'Oswald'; font-weight:700; font-size:18px; }
+  .brand-name em{ font-style:normal; color:var(--yellow-dark); }
+  .phone-link{ font-family:'IBM Plex Mono'; font-weight:600; font-size:14px; }
+
+  .hero{ padding:36px 0 6px; }
+  .hero h1{ font-size:clamp(24px,4vw,34px); margin-bottom:6px; }
+  .hero p{ color:var(--steel); font-size:14.5px; }
+
+  /* ---- STEP INDICATOR ---- */
+  .steps{ display:flex; justify-content:space-between; margin:30px 0 6px; position:relative; }
+  .steps::before{
+    content:""; position:absolute; top:15px; left:6%; right:6%; height:2px; background:var(--line); z-index:0;
+  }
+  .step-item{ display:flex; flex-direction:column; align-items:center; gap:8px; position:relative; z-index:1; flex:1; }
+  .step-dot{
+    width:30px;height:30px;border-radius:50%; background:var(--card); border:2px solid var(--line);
+    display:flex;align-items:center;justify-content:center; font-family:'IBM Plex Mono'; font-size:12px; font-weight:700; color:var(--steel);
+  }
+  .step-item.active .step-dot{ background:var(--yellow); border-color:var(--asphalt); color:var(--asphalt); }
+  .step-item.done .step-dot{ background:var(--asphalt); border-color:var(--asphalt); color:var(--yellow); }
+  .step-label{ font-family:'IBM Plex Mono'; font-size:10.5px; letter-spacing:0.04em; text-transform:uppercase; color:var(--steel); text-align:center; }
+  .step-item.active .step-label{ color:var(--asphalt); font-weight:700; }
+
+  /* ---- PANEL ---- */
+  .panel{ background:var(--card); border:2px solid var(--asphalt); box-shadow:8px 8px 0 var(--yellow); padding:30px; margin:34px 0 60px; }
+  .panel h2{ font-size:20px; margin-bottom:6px; }
+  .panel .sub{ color:var(--steel); font-size:14px; margin-bottom:22px; }
+
+  .field{ margin-bottom:16px; }
+  .field label{
+    display:block; font-family:'IBM Plex Mono'; font-size:11.5px; letter-spacing:0.04em; text-transform:uppercase;
+    color:var(--steel); margin-bottom:6px; font-weight:600;
+  }
+  .field input, .field select, .field textarea{
+    width:100%; border:2px solid var(--asphalt); background:var(--concrete);
+    padding:11px 12px; font-family:'Work Sans'; font-size:14.5px; color:var(--asphalt);
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{ outline:none; background:#fff; box-shadow:0 0 0 3px rgba(245,184,0,0.45); }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .row3{ display:grid; grid-template-columns:1.4fr 0.8fr 0.8fr; gap:16px; }
+  @media (max-width:600px){ .row2, .row3{ grid-template-columns:1fr; } }
+
+  /* ---- LOAD SIZE CARDS (no price shown) ---- */
+  .size-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:6px; }
+  @media (max-width:600px){ .size-grid{ grid-template-columns:1fr; } }
+  .size-card{
+    border:2px solid var(--line); background:var(--concrete); padding:14px 16px; cursor:pointer; position:relative;
+    transition:border-color .12s ease;
+  }
+  .size-card:hover{ border-color:var(--yellow-dark); }
+  .size-card.selected{ border-color:var(--asphalt); background:#fff; box-shadow:3px 3px 0 var(--yellow); }
+  .size-card input{ position:absolute; opacity:0; }
+  .size-card .stitle{ font-weight:700; font-size:14.5px; margin-bottom:4px; }
+  .size-card .sdesc{ font-size:12.5px; color:var(--steel); }
+  .gauge-track{ height:8px; background:var(--line); margin-top:8px; }
+  .gauge-fill{ height:100%; background:var(--yellow); }
+
+  .file-drop{
+    border:2px dashed var(--line); background:var(--concrete); padding:20px; text-align:center; cursor:pointer;
+  }
+  .file-drop:hover{ border-color:var(--yellow-dark); }
+  .file-drop input{ display:none; }
+  .file-list{ margin-top:10px; font-size:13px; color:var(--steel); }
+
+  .btn{
+    display:inline-block; font-family:'Oswald'; font-weight:600; text-transform:uppercase; letter-spacing:0.03em;
+    background:var(--yellow); color:var(--asphalt); padding:13px 26px; font-size:14.5px;
+    border:2px solid var(--asphalt); box-shadow:4px 4px 0 var(--asphalt); cursor:pointer; transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:hover{ transform:translate(2px,2px); box-shadow:2px 2px 0 var(--asphalt); }
+  .btn:disabled{ opacity:0.5; cursor:not-allowed; }
+  .btn-outline{
+    display:inline-block; font-family:'Oswald'; font-weight:600; text-transform:uppercase; letter-spacing:0.03em;
+    background:transparent; color:var(--asphalt); padding:12px 22px; font-size:14.5px; border:2px solid var(--asphalt); cursor:pointer;
+  }
+  .btn-row{ display:flex; justify-content:space-between; align-items:center; margin-top:26px; gap:14px; }
+
+  /* ---- REVIEW STEP ---- */
+  .review-block{ border:1px dashed var(--line); padding:16px 18px; margin-bottom:14px; }
+  .review-block h3{ font-family:'IBM Plex Mono'; font-size:11.5px; letter-spacing:0.06em; color:var(--steel); margin-bottom:8px; text-transform:uppercase; }
+  .review-block p{ font-size:14.5px; }
+  .review-block .edit-link{ float:right; font-size:12px; color:var(--yellow-dark); font-family:'IBM Plex Mono'; cursor:pointer; text-decoration:underline; }
+
+  .price-reveal{
+    background:var(--asphalt); color:#fff; padding:22px 24px; margin:22px 0; text-align:center;
+  }
+  .price-reveal .plabel{ font-family:'IBM Plex Mono'; font-size:12px; letter-spacing:0.1em; color:var(--yellow); margin-bottom:6px; }
+  .price-reveal .pamount{ font-family:'Oswald'; font-size:44px; font-weight:700; }
+  .price-reveal .pnote{ font-size:12.5px; color:#B9C0CC; margin-top:6px; }
+
+  #card-element{ border:2px solid var(--asphalt); background:var(--concrete); padding:13px 12px; margin-top:6px; }
+  #card-errors{ color:var(--err); font-size:13px; margin-top:8px; }
+  .policy-note{ font-size:12.5px; color:var(--steel); margin-top:14px; }
+
+  .hidden{ display:none !important; }
+
+  footer{ background:var(--asphalt); color:#9AA0A8; padding:30px 0; font-size:13px; text-align:center; }
+</style>
+</head>
+<body>
+
+  <header class="nav">
+    <div class="wrap">
+      <a class="brand" href="/">
+        <div class="brand-mark"><span>JM</span></div>
+        <div class="brand-name">JUNK <em>MOVERS</em></div>
+      </a>
+      <a class="phone-link" href="tel:+12162640508">(216) 264-0508</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap">
+      <h1>Book Your Haul</h1>
+      <p>A few quick steps — your price is confirmed at the end, before you pay anything.</p>
+    </div>
+  </section>
+
+  <div class="wrap">
+    <div class="steps" id="stepIndicator">
+      <div class="step-item active" data-step="0"><div class="step-dot">1</div><div class="step-label">Address</div></div>
+      <div class="step-item" data-step="1"><div class="step-dot">2</div><div class="step-label">Contact</div></div>
+      <div class="step-item" data-step="2"><div class="step-dot">3</div><div class="step-label">Details</div></div>
+      <div class="step-item" data-step="3"><div class="step-dot">4</div><div class="step-label">Schedule</div></div>
+      <div class="step-item" data-step="4"><div class="step-dot">5</div><div class="step-label">Review</div></div>
+    </div>
+
+    <!-- STEP 1: ADDRESS -->
+    <div class="panel step-panel" data-panel="0">
+      <h2>Where's the pickup?</h2>
+      <p class="sub">Property address for the job.</p>
+      <div class="field"><label for="street">Street Address</label><input type="text" id="street" required></div>
+      <div class="row3">
+        <div class="field"><label for="city">City</label><input type="text" id="city" value="" required></div>
+        <div class="field"><label for="state">State</label><input type="text" id="state" value="OH" maxlength="2" required></div>
+        <div class="field"><label for="zip">ZIP</label><input type="text" id="zip" required></div>
+      </div>
+      <div class="btn-row"><span></span><button class="btn" onclick="nextStep(0)">Continue</button></div>
+    </div>
+
+    <!-- STEP 2: CONTACT -->
+    <div class="panel step-panel hidden" data-panel="1">
+      <h2>How do we reach you?</h2>
+      <p class="sub">We'll text you updates and your confirmation.</p>
+      <div class="field"><label for="name">Full Name</label><input type="text" id="name" required></div>
+      <div class="row2">
+        <div class="field"><label for="phone">Phone Number</label><input type="tel" id="phone" required></div>
+        <div class="field"><label for="email">Email (optional)</label><input type="email" id="email"></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-outline" onclick="prevStep(1)">Back</button>
+        <button class="btn" onclick="nextStep(1)">Continue</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: DETAILS -->
+    <div class="panel step-panel hidden" data-panel="2">
+      <h2>What needs to go?</h2>
+      <p class="sub">Pick the closest size — we'll confirm the exact price on the last step.</p>
+      <div class="size-grid" id="sizeGrid">
+        <label class="size-card" data-tier="single">
+          <input type="radio" name="tier" value="single">
+          <div class="stitle">Single Item</div>
+          <div class="sdesc">Couch, mattress, appliance</div>
+          <div class="gauge-track"><div class="gauge-fill" style="width:15%;"></div></div>
+        </label>
+        <label class="size-card" data-tier="quarter">
+          <input type="radio" name="tier" value="quarter">
+          <div class="stitle">Quarter Load</div>
+          <div class="sdesc">A few boxes + small furniture</div>
+          <div class="gauge-track"><div class="gauge-fill" style="width:35%;"></div></div>
+        </label>
+        <label class="size-card" data-tier="half">
+          <input type="radio" name="tier" value="half">
+          <div class="stitle">Half Load</div>
+          <div class="sdesc">Garage or small room</div>
+          <div class="gauge-track"><div class="gauge-fill" style="width:55%;"></div></div>
+        </label>
+        <label class="size-card" data-tier="three_q">
+          <input type="radio" name="tier" value="three_q">
+          <div class="stitle">Three-Quarter Load</div>
+          <div class="sdesc">Large cleanout, multiple rooms</div>
+          <div class="gauge-track"><div class="gauge-fill" style="width:78%;"></div></div>
+        </label>
+        <label class="size-card" data-tier="full" style="grid-column:1/-1;">
+          <input type="radio" name="tier" value="full">
+          <div class="stitle">Full Load</div>
+          <div class="sdesc">Full garage or small house</div>
+          <div class="gauge-track"><div class="gauge-fill" style="width:98%;"></div></div>
+        </label>
+      </div>
+
+      <div class="field" style="margin-top:18px;">
+        <label for="description">Describe what needs to go</label>
+        <textarea id="description" rows="3" placeholder="e.g. old couch, 10 boxes, a dresser"></textarea>
+      </div>
+
+      <div class="field">
+        <label>Photos (optional, helps us confirm the price)</label>
+        <div class="file-drop" onclick="document.getElementById('photoInput').click()">
+          <span class="mono" style="font-size:13px;">Tap to add photos</span>
+          <input type="file" id="photoInput" accept="image/*" multiple>
+        </div>
+        <div class="file-list" id="fileList"></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn-outline" onclick="prevStep(2)">Back</button>
+        <button class="btn" id="detailsNextBtn" onclick="nextStep(2)" disabled>Continue</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: SCHEDULE -->
+    <div class="panel step-panel hidden" data-panel="3">
+      <h2>When works for you?</h2>
+      <p class="sub">Pick a preferred day and window — we'll confirm exact timing by text.</p>
+      <div class="row2">
+        <div class="field"><label for="jobDate">Preferred Date</label><input type="date" id="jobDate" required></div>
+        <div class="field">
+          <label for="jobWindow">Preferred Window</label>
+          <select id="jobWindow">
+            <option value="Morning (8-11am)">Morning (8–11am)</option>
+            <option value="Afternoon (12-3pm)">Afternoon (12–3pm)</option>
+            <option value="Evening (4-7pm)">Evening (4–7pm)</option>
+            <option value="ASAP / same-day if available">ASAP / same-day if available</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn-outline" onclick="prevStep(3)">Back</button>
+        <button class="btn" onclick="nextStep(3)">Continue to Review</button>
+      </div>
+    </div>
+
+    <!-- STEP 5: REVIEW + PAYMENT -->
+    <div class="panel step-panel hidden" data-panel="4">
+      <h2>Review &amp; Confirm</h2>
+      <p class="sub">Here's everything you entered. Your price is below.</p>
+
+      <div class="review-block">
+        <h3>Address <span class="edit-link" onclick="goToStep(0)">Edit</span></h3>
+        <p id="rvAddress"></p>
+      </div>
+      <div class="review-block">
+        <h3>Contact <span class="edit-link" onclick="goToStep(1)">Edit</span></h3>
+        <p id="rvContact"></p>
+      </div>
+      <div class="review-block">
+        <h3>Job Details <span class="edit-link" onclick="goToStep(2)">Edit</span></h3>
+        <p id="rvDetails"></p>
+      </div>
+      <div class="review-block">
+        <h3>Schedule <span class="edit-link" onclick="goToStep(3)">Edit</span></h3>
+        <p id="rvSchedule"></p>
+      </div>
+
+      <div class="price-reveal">
+        <div class="plabel">YOUR CONFIRMED PRICE</div>
+        <div class="pamount" id="rvPrice">$0</div>
+        <div class="pnote">Card is authorized now, charged only after the job's completed.</div>
+      </div>
+
+      <div class="field">
+        <label>Card Details</label>
+        <div id="card-element"></div>
+        <div id="card-errors"></div>
+      </div>
+
+      <p class="policy-note">
+        Price is based on the load size and photos you provided. If the actual job differs significantly,
+        we'll confirm any adjustment with you by text before charging. Your card is authorized today but
+        not charged until the job is complete.
+      </p>
+
+      <div class="btn-row">
+        <button class="btn-outline" onclick="prevStep(4)">Back</button>
+        <button class="btn" id="payBtn" onclick="submitBooking()">Confirm &amp; Authorize Payment</button>
+      </div>
+      <div id="submitStatus" style="margin-top:14px; font-size:14px;"></div>
+    </div>
+  </div>
+
+  <footer>Junk Movers · Cleveland &amp; Parma, OH · (216) 264-0508</footer>
+
+<script>
+  // ---- Pricing mirrors the server-side table exactly (display only — the server recomputes and enforces it) ----
+  const PRICING = {
+    single:  { amount: 115, label: 'Single Item' },
+    quarter: { amount: 270, label: 'Quarter Load' },
+    half:    { amount: 425, label: 'Half Load' },
+    three_q: { amount: 540, label: 'Three-Quarter Load' },
+    full:    { amount: 650, label: 'Full Load' },
+  };
+
+  const STRIPE_PUBLISHABLE_KEY = 'pk_test_51RH9XlED84ywWySHz6VVjaAaSLa4wsWl69diif3M72tzRyMWZm0vnE8L18DLEK5UlJO4WanDdMZlgnuB2sT5IFt400uyETesZd';
+  const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+  const elements = stripe.elements();
+  const cardElement = elements.create('card', {
+    style: { base: { fontFamily: "'Work Sans', sans-serif", fontSize: '15px', color: '#17181C' } }
+  });
+
+  let currentStep = 0;
+  const totalSteps = 5;
+  let cardMounted = false;
+  let selectedTier = null;
+
+  function showStep(i){
+    document.querySelectorAll('.step-panel').forEach(p => p.classList.add('hidden'));
+    document.querySelector(`.step-panel[data-panel="${i}"]`).classList.remove('hidden');
+    document.querySelectorAll('.step-item').forEach((el, idx) => {
+      el.classList.remove('active','done');
+      if(idx < i) el.classList.add('done');
+      if(idx === i) el.classList.add('active');
+    });
+    window.scrollTo({top:0, behavior:'smooth'});
+    currentStep = i;
+    if(i === 4){
+      buildReview();
+      if(!cardMounted){ cardElement.mount('#card-element'); cardMounted = true; }
+    }
+  }
+  function nextStep(i){
+    if(!validateStep(i)) return;
+    showStep(i+1);
+  }
+  function prevStep(i){ showStep(i-1); }
+  function goToStep(i){ showStep(i); }
+
+  function validateStep(i){
+    if(i === 0){
+      const street = document.getElementById('street').value.trim();
+      const city = document.getElementById('city').value.trim();
+      const zip = document.getElementById('zip').value.trim();
+      if(!street || !city || !zip){ alert('Please fill in your full address.'); return false; }
+    }
+    if(i === 1){
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      if(!name || !phone){ alert('Please enter your name and phone number.'); return false; }
+    }
+    if(i === 2){
+      if(!selectedTier){ alert('Please select a load size.'); return false; }
+    }
+    if(i === 3){
+      const jobDate = document.getElementById('jobDate').value;
+      if(!jobDate){ alert('Please pick a preferred date.'); return false; }
+    }
+    return true;
+  }
+
+  // Load size selection
+  document.querySelectorAll('.size-card').forEach(card => {
+    card.addEventListener('click', () => {
+      document.querySelectorAll('.size-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      card.querySelector('input').checked = true;
+      selectedTier = card.dataset.tier;
+      document.getElementById('detailsNextBtn').disabled = false;
+    });
+  });
+
+  // Photo file list display
+  document.getElementById('photoInput').addEventListener('change', (e) => {
+    const files = Array.from(e.target.files).map(f => f.name).join(', ');
+    document.getElementById('fileList').textContent = files ? `Selected: ${files}` : '';
+  });
+
+  function buildReview(){
+    const street = document.getElementById('street').value;
+    const city = document.getElementById('city').value;
+    const state = document.getElementById('state').value;
+    const zip = document.getElementById('zip').value;
+    document.getElementById('rvAddress').textContent = `${street}, ${city}, ${state} ${zip}`;
+
+    const name = document.getElementById('name').value;
+    const phone = document.getElementById('phone').value;
+    const email = document.getElementById('email').value;
+    document.getElementById('rvContact').textContent = `${name} — ${phone}${email ? ' — ' + email : ''}`;
+
+    const desc = document.getElementById('description').value;
+    const tierInfo = PRICING[selectedTier];
+    document.getElementById('rvDetails').textContent = `${tierInfo.label}${desc ? ' — ' + desc : ''}`;
+
+    const jobDate = document.getElementById('jobDate').value;
+    const jobWindow = document.getElementById('jobWindow').value;
+    document.getElementById('rvSchedule').textContent = `${jobDate} — ${jobWindow}`;
+
+    document.getElementById('rvPrice').textContent = `$${tierInfo.amount}`;
+  }
+
+  async function submitBooking(){
+    const payBtn = document.getElementById('payBtn');
+    const statusEl = document.getElementById('submitStatus');
+    payBtn.disabled = true;
+    statusEl.textContent = 'Processing...';
+    statusEl.style.color = '#5B6067';
+
+    const payload = {
+      tier: selectedTier,
+      name: document.getElementById('name').value,
+      phone: document.getElementById('phone').value,
+      email: document.getElementById('email').value,
+      address: document.getElementById('street').value,
+      city: document.getElementById('city').value,
+      state: document.getElementById('state').value,
+      zip: document.getElementById('zip').value,
+      jobDate: document.getElementById('jobDate').value,
+      jobWindow: document.getElementById('jobWindow').value,
+      description: document.getElementById('description').value,
+    };
+
+    try {
+      const res = await fetch('/.netlify/functions/create-payment-intent', {
+        method: 'POST',
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if(!res.ok){ throw new Error(data.error || 'Something went wrong.'); }
+
+      const result = await stripe.confirmCardPayment(data.clientSecret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: { name: payload.name, email: payload.email || undefined, phone: payload.phone },
+        }
+      });
+
+      if(result.error){
+        document.getElementById('card-errors').textContent = result.error.message;
+        statusEl.textContent = '';
+        payBtn.disabled = false;
+        return;
+      }
+
+      // Also fire a Netlify Forms submission so the booking shows up in email, same as other leads.
+      const formBody = new URLSearchParams({
+        'form-name': 'booking-request', ...payload, price: `$${PRICING[selectedTier].amount}`
+      }).toString();
+      fetch('/', { method: 'POST', headers: {'Content-Type':'application/x-www-form-urlencoded'}, body: formBody }).catch(()=>{});
+
+      window.location.href = '/thanks-booking.html';
+    } catch (err) {
+      statusEl.textContent = err.message || 'Something went wrong. Please try again.';
+      statusEl.style.color = '#B23A2E';
+      payBtn.disabled = false;
+    }
+  }
+</script>
+
+<!-- Hidden static form so Netlify detects and provisions the "booking-request" form for email notifications -->
+<form name="booking-request" data-netlify="true" hidden>
+  <input name="tier" /><input name="name" /><input name="phone" /><input name="email" />
+  <input name="address" /><input name="city" /><input name="state" /><input name="zip" />
+  <input name="jobDate" /><input name="jobWindow" /><input name="description" /><input name="price" />
+</form>
+
+</body>
+</html>
