@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Haul With Us | Junk Movers Driver Application</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Work+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --asphalt:#17181C;
+    --concrete:#EDEEF0;
+    --card:#FFFFFF;
+    --yellow:#F5B800;
+    --yellow-dark:#8A6400;
+    --steel:#5B6067;
+    --line:#DADCE0;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{ font-family:'Work Sans',sans-serif; background:var(--concrete); color:var(--asphalt); line-height:1.55; }
+  h1,h2,.display{ font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:0.01em; line-height:1.08; }
+  a{ color:inherit; text-decoration:none; }
+  .wrap{ max-width:820px; margin:0 auto; padding:0 24px; }
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace; font-size:12.5px; letter-spacing:0.16em;
+    text-transform:uppercase; color:var(--yellow-dark); font-weight:600;
+  }
+
+  header.nav{ background:var(--card); border-bottom:3px solid var(--asphalt); }
+  .nav .wrap{ display:flex; align-items:center; justify-content:space-between; padding:16px 24px; max-width:1140px; }
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .brand-mark{
+    width:44px;height:44px; background:var(--asphalt); display:flex;align-items:center;justify-content:center;
+    transform:skewX(-6deg);
+  }
+  .brand-mark span{ color:var(--yellow); font-family:'Oswald'; font-weight:700; font-size:18px; transform:skewX(6deg); }
+  .brand-name{ font-family:'Oswald'; font-weight:700; font-size:21px; letter-spacing:0.02em; }
+  .brand-name em{ font-style:normal; color:var(--yellow-dark); }
+  .phone-link{ font-family:'IBM Plex Mono'; font-weight:600; font-size:14px; }
+  .phone-link:hover{ color:var(--yellow-dark); }
+
+  .hero{ padding:48px 0 8px; }
+  .hero h1{ font-size:clamp(28px,4.6vw,42px); margin:14px 0 12px; }
+  .hero p{ font-size:15.5px; color:var(--steel); max-width:60ch; }
+
+  .section{ padding:36px 0 80px; }
+  .apply-panel{ background:var(--card); border:2px solid var(--asphalt); box-shadow:8px 8px 0 var(--yellow); padding:32px; }
+  .apply-grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px 20px; }
+  @media (max-width:700px){ .apply-grid{ grid-template-columns:1fr; } .apply-panel{ padding:22px; } }
+  .apply-grid .full{ grid-column:1 / -1; }
+  .payout-table{ width:100%; border-collapse:collapse; margin-top:4px; }
+  .payout-table th{
+    background:var(--asphalt); color:var(--yellow); font-family:'IBM Plex Mono'; font-size:11px;
+    letter-spacing:0.06em; text-transform:uppercase; text-align:left; padding:9px 12px;
+  }
+  .payout-table td{
+    padding:9px 12px; font-size:13.5px; border-bottom:1px dotted var(--line); background:var(--concrete);
+  }
+  .payout-table td.pay{ font-family:'IBM Plex Mono'; font-weight:700; color:var(--yellow-dark); text-align:right; }
+  .payout-note{ font-size:12px; color:var(--steel); margin-top:8px; }
+  .f-label{
+    display:block; font-family:'IBM Plex Mono'; font-size:11.5px; letter-spacing:0.04em;
+    text-transform:uppercase; color:var(--steel); margin-bottom:6px; font-weight:600;
+  }
+  .apply-grid input[type="text"],
+  .apply-grid input[type="tel"],
+  .apply-grid input[type="email"],
+  .apply-grid select{
+    width:100%; border:2px solid var(--asphalt); background:var(--concrete);
+    padding:11px 12px; font-family:'Work Sans'; font-size:14.5px; color:var(--asphalt);
+  }
+  .apply-grid input:focus, .apply-grid select:focus{ outline:none; background:#fff; box-shadow:0 0 0 3px rgba(245,184,0,0.45); }
+  .day-chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .day-chip{ position:relative; }
+  .day-chip input{ position:absolute; opacity:0; inset:0; cursor:pointer; margin:0; width:100%; height:100%; }
+  .day-chip span{
+    display:inline-block; font-family:'IBM Plex Mono'; font-size:12.5px; font-weight:600;
+    border:2px solid var(--asphalt); padding:8px 14px; background:var(--concrete);
+  }
+  .day-chip input:checked + span{ background:var(--yellow); }
+  .apply-note{ font-size:12.5px; color:var(--steel); margin-top:4px; }
+  .hp-field{ position:absolute; left:-9999px; }
+  .btn{
+    display:inline-block; font-family:'Oswald'; font-weight:600; text-transform:uppercase; letter-spacing:0.03em;
+    background:var(--yellow); color:var(--asphalt); padding:13px 24px; font-size:14.5px;
+    border:2px solid var(--asphalt); box-shadow:4px 4px 0 var(--asphalt); transition:transform .12s ease, box-shadow .12s ease;
+    cursor:pointer;
+  }
+  .btn:hover{ transform:translate(2px,2px); box-shadow:2px 2px 0 var(--asphalt); }
+
+  footer{ background:var(--asphalt); color:#9AA0A8; padding:30px 0; font-size:13px; text-align:center; }
+  footer a:hover{ color:var(--yellow); }
+</style>
+</head>
+<body>
+
+  <header class="nav">
+    <div class="wrap">
+      <div class="brand">
+        <div class="brand-mark"><span>JM</span></div>
+        <div class="brand-name">JUNK <em>MOVERS</em></div>
+      </div>
+      <a class="phone-link" href="tel:+12162640508">(216) 264-0508</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap">
+      <span class="eyebrow">◆ DRIVER / HAULER APPLICATION</span>
+      <h1>Got a truck? Haul with us.</h1>
+      <p>We're always adding drivers to our on-call list. Fill this out once — no contract, no commitment — and we'll reach out when a job near you fits your schedule and your rate.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="wrap">
+      <div class="apply-panel">
+        <form name="haul-application" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/thanks-haul.html">
+          <input type="hidden" name="form-name" value="haul-application" />
+          <p class="hp-field"><label>Don't fill this out: <input name="bot-field" /></label></p>
+
+          <div class="apply-grid">
+            <div>
+              <label class="f-label" for="name">Full Name</label>
+              <input type="text" id="name" name="Full Name" required>
+            </div>
+            <div>
+              <label class="f-label" for="phone">Phone Number</label>
+              <input type="tel" id="phone" name="Phone Number" required>
+            </div>
+
+            <div>
+              <label class="f-label" for="email">Email (optional)</label>
+              <input type="email" id="email" name="Email">
+            </div>
+            <div>
+              <label class="f-label" for="city">City / Area You're Based In</label>
+              <input type="text" id="city" name="City / Area">
+            </div>
+
+            <div>
+              <label class="f-label" for="truck">Truck or Trailer Type</label>
+              <input type="text" id="truck" name="Truck or Trailer Type" placeholder="e.g. pickup, box truck">
+            </div>
+            <div>
+              <label class="f-label" for="size">Approx. Bed / Trailer Size</label>
+              <input type="text" id="size" name="Bed or Trailer Size">
+            </div>
+
+            <div>
+              <label class="f-label" for="heavy">Comfortable Handling Heavy Items?</label>
+              <select id="heavy" name="Handles Heavy Items">
+                <option value="">Select one</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label class="f-label" for="notice">Notice Needed Before a Job</label>
+              <input type="text" id="notice" name="Notice Needed" placeholder="e.g. same-day is fine">
+            </div>
+
+            <div class="full">
+              <label class="f-label">Days You're Generally Available</label>
+              <div class="day-chips">
+                <label class="day-chip"><input type="checkbox" name="Available Days" value="Mon"><span>Mon</span></label>
+                <label class="day-chip"><input type="checkbox" name="Available Days" value="Tue"><span>Tue</span></label>
+                <label class="day-chip"><input type="checkbox" name="Available Days" value="Wed"><span>Wed</span></label>
+                <label class="day-chip"><input type="checkbox" name="Available Days" value="Thu"><span>Thu</span></label>
+                <label class="day-chip"><input type="checkbox" name="Available Days" value="Fri"><span>Fri</span></label>
+                <label class="day-chip"><input type="checkbox" name="Available Days" value="Sat"><span>Sat</span></label>
+                <label class="day-chip"><input type="checkbox" name="Available Days" value="Sun"><span>Sun</span></label>
+              </div>
+            </div>
+
+            <div>
+              <label class="f-label" for="sameday">Can You Take Same-Day Jobs?</label>
+              <select id="sameday" name="Same-Day Availability">
+                <option value="">Select one</option>
+                <option value="Yes">Yes</option>
+                <option value="Sometimes">Sometimes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label class="f-label" for="payment">Preferred Payment Method</label>
+              <select id="payment" name="Payment Method">
+                <option value="">Select one</option>
+                <option>Venmo</option>
+                <option>Cash App</option>
+                <option>Zelle</option>
+                <option>Cash</option>
+                <option>Other</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="f-label" for="vins">Vehicle Insurance?</label>
+              <select id="vins" name="Vehicle Insurance">
+                <option value="">Select one</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+            <div>
+              <label class="f-label" for="lins">General Liability Insurance?</label>
+              <select id="lins" name="Liability Insurance">
+                <option value="">Select one</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+
+            <div class="full">
+              <label class="f-label">What You'd Earn (50/50 split, per job)</label>
+              <table class="payout-table">
+                <tr><th>Job Size</th><th style="text-align:right;">You Earn</th></tr>
+                <tr><td>Single item</td><td class="pay">$57.50</td></tr>
+                <tr><td>Quarter load</td><td class="pay">$135</td></tr>
+                <tr><td>Half load</td><td class="pay">$212.50</td></tr>
+                <tr><td>Three-quarter load</td><td class="pay">$270</td></tr>
+                <tr><td>Full load</td><td class="pay">$325</td></tr>
+              </table>
+              <p class="payout-note">You keep half of every job — no negotiating per job, same split every time.</p>
+            </div>
+
+            <div class="full">
+              <label class="f-label" for="rate">Does This Payout Work For You?</label>
+              <select id="rate" name="Payout Confirmation">
+                <option value="">Select one</option>
+                <option value="Yes, works for me">Yes, works for me</option>
+                <option value="Depends on the job">Depends on the job</option>
+                <option value="No, I'd need more">No, I'd need more</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="margin-top:26px; display:flex; align-items:center; gap:18px; flex-wrap:wrap;">
+            <button type="submit" class="btn">Submit Application</button>
+            <span class="apply-note">No contract yet — this just gets you on our list.</span>
+          </div>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Junk Movers · Cleveland &amp; Parma, OH · <a href="tel:+12162640508">(216) 264-0508</a>
+  </footer>
+
+</body>
+</html>
